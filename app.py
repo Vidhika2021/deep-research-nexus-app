@@ -5,8 +5,9 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel
-import httpx
+import requests
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -50,22 +51,27 @@ async def perform_research(request: ResearchRequest):
         "session_id": str(uuid.uuid4())
     }
 
-    try:
-        async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
-            logger.info(f"Sending request to IBM Agent API for query: {request.query}")
-            response = await client.post(API_URL, json=payload, headers=headers)
-            
-            # Log the response status for debugging
-            logger.info(f"Upstream API Status: {response.status_code}")
-            
-            if response.status_code != 200:
-                logger.error(f"Upstream API Error: {response.text}")
-                raise HTTPException(status_code=response.status_code, detail=f"Upstream API Error: {response.text}")
+    def make_request():
+        # Use requests to match user's working snippet exactly
+        # Requests automatically handles cookies/headers on redirect better in some cases
+        return requests.post(API_URL, json=payload, headers=headers)
 
-            return response.json()
+    try:
+        logger.info(f"Sending request to IBM Agent API for query: {request.query}")
+        
+        # Run synchronous requests in a separate thread to not block the event loop
+        response = await run_in_threadpool(make_request)
+        
+        logger.info(f"Upstream API Status: {response.status_code}")
+        
+        if response.status_code != 200:
+            logger.error(f"Upstream API Error: {response.text}")
+            raise HTTPException(status_code=response.status_code, detail=f"Upstream API Error: {response.text}")
+
+        return response.json()
             
-    except httpx.RequestError as exc:
-        logger.error(f"An error occurred while requesting {exc.request.url!r}.")
+    except requests.exceptions.RequestException as exc:
+        logger.error(f"Connection error: {exc}")
         raise HTTPException(status_code=500, detail=f"Connection error to research service")
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
