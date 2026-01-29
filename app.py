@@ -72,7 +72,7 @@ async def perform_research(request: ResearchRequest):
             
     except requests.exceptions.RequestException as exc:
         logger.error(f"Connection error: {exc}")
-        raise HTTPException(status_code=500, detail=f"Connection error to research service")
+        raise HTTPException(status_code=500, detail=f"Connection error: {str(exc)}")
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
