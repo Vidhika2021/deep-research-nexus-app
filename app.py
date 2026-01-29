@@ -68,7 +68,12 @@ async def perform_research(request: ResearchRequest):
             logger.error(f"Upstream API Error: {response.text}")
             raise HTTPException(status_code=response.status_code, detail=f"Upstream API Error: {response.text}")
 
-        return response.json()
+        try:
+            return response.json()
+        except Exception:
+            # If response is not JSON (e.g. HTML login page), return text as error
+            logger.error(f"Invalid JSON response: {response.text[:200]}")
+            raise HTTPException(status_code=500, detail=f"Invalid API Response (Not JSON). content: {response.text[:200]}")
             
     except requests.exceptions.RequestException as exc:
         logger.error(f"Connection error: {exc}")
