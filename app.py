@@ -51,7 +51,7 @@ async def perform_research(request: ResearchRequest):
     }
 
     try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
             logger.info(f"Sending request to IBM Agent API for query: {request.query}")
             response = await client.post(API_URL, json=payload, headers=headers)
             
