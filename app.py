@@ -33,7 +33,9 @@ async def read_root(request: Request):
 
 @app.post("/api/research")
 async def perform_research(request: ResearchRequest):
-    api_key = os.environ.get("AGENTS_API_KEY")
+    # Strip whitespace/newlines from the key!
+    api_key_raw = os.environ.get("AGENTS_API_KEY")
+    api_key = api_key_raw.strip() if api_key_raw else None
     
     if not api_key:
         logger.error("AGENTS_API_KEY environment variable not set")
@@ -41,7 +43,8 @@ async def perform_research(request: ResearchRequest):
 
     headers = {
         "x-api-key": api_key,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
 
     payload = {
@@ -52,14 +55,11 @@ async def perform_research(request: ResearchRequest):
     }
 
     def make_request():
-        # Use requests to match user's working snippet exactly
-        # Requests automatically handles cookies/headers on redirect better in some cases
         return requests.post(API_URL, json=payload, headers=headers)
 
     try:
         logger.info(f"Sending request to IBM Agent API for query: {request.query}")
         
-        # Run synchronous requests in a separate thread to not block the event loop
         response = await run_in_threadpool(make_request)
         
         logger.info(f"Upstream API Status: {response.status_code}")
@@ -71,9 +71,14 @@ async def perform_research(request: ResearchRequest):
         try:
             return response.json()
         except Exception:
-            # If response is not JSON (e.g. HTML login page), return text as error
-            logger.error(f"Invalid JSON response: {response.text[:200]}")
-            raise HTTPException(status_code=500, detail=f"Invalid API Response (Not JSON). content: {response.text[:200]}")
+            # Enhanced debugging for non-JSON responses
+            debug_info = (
+                f"Status: {response.status_code} | "
+                f"Headers: {dict(response.headers)} | "
+                f"Content-Repr: {repr(response.text[:200])}"
+            )
+            logger.error(f"Invalid JSON response. {debug_info}")
+            raise HTTPException(status_code=500, detail=f"Invalid API Response (Not JSON). {debug_info}")
             
     except requests.exceptions.RequestException as exc:
         logger.error(f"Connection error: {exc}")
