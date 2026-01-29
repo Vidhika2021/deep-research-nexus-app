@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Research Nexus</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="background-globes">
+        <div class="globe globe-1"></div>
+        <div class="globe globe-2"></div>
+    </div>
+
+    <main class="container">
+        <header class="hero">
+            <h1 class="logo">Deep Research <span class="highlight">Nexus</span></h1>
+            <p class="subtitle">Uncover hidden insights with AI-powered deep analysis.</p>
+        </header>
+
+        <section class="search-section">
+            <div class="search-box">
+                <input type="text" id="queryInput" placeholder="What requires deep investigation today?" autocomplete="off">
+                <button id="searchBtn" class="search-btn">
+                    <span class="btn-text">Initialize Research</span>
+                    <div class="loader hidden"></div>
+                </button>
+            </div>
+        </section>
+
+        <section id="resultsSection" class="results-section hidden">
+            <div class="results-card glass-panel">
+                <div class="results-header">
+                    <h2>Analysis Report</h2>
+                    <button class="copy-btn" id="copyBtn">Copy</button>
+                </div>
+                <div id="resultsContent" class="markdown-body">
+                    <!-- Results will be injected here -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Deep Research Nexus. Powered by IBM Agent API.</p>
+    </footer>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
