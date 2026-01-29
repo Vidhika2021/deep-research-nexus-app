@@ -72,13 +72,18 @@ async def perform_research(request: ResearchRequest):
             return response.json()
         except Exception:
             # Enhanced debugging for non-JSON responses
+            key_debug = f"Len={len(api_key)}" if api_key else "None"
+            if api_key and len(api_key) > 6:
+                key_debug += f", Start={api_key[:3]}..., End=...{api_key[-3:]}"
+                
             debug_info = (
                 f"Status: {response.status_code} | "
+                f"Key-Debug: {key_debug} | "
                 f"Headers: {dict(response.headers)} | "
                 f"Content-Repr: {repr(response.text[:200])}"
             )
             logger.error(f"Invalid JSON response. {debug_info}")
-            raise HTTPException(status_code=500, detail=f"Invalid API Response (Not JSON). {debug_info}")
+            raise HTTPException(status_code=500, detail=f"Invalid API Response. {debug_info}")
             
     except requests.exceptions.RequestException as exc:
         logger.error(f"Connection error: {exc}")
