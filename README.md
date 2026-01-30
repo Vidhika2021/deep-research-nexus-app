@@ -6,7 +6,7 @@ A premium Deep Research web application powered by IBM Agent API.
 
 Click the button below to deploy this application to Render instantly.
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/VIDHIKASEHGAL/deep-research-nexus-app)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Vidhika2021/deep-research-nexus-app)
 
 ## Local Setup
 

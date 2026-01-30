@@ -22,7 +22,8 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # Configuration
-API_URL = "https://agentstudio.servicesessentials.ibm.com/api/v1/run/e96ee1a0-9af5-4168-b042-7bda2df7431f"
+# Configuration
+API_URL = "https://deep-research-api-mrqq.onrender.com/deep-research"
 
 class ResearchRequest(BaseModel):
     query: str
@@ -33,32 +34,25 @@ async def read_root(request: Request):
 
 @app.post("/api/research")
 async def perform_research(request: ResearchRequest):
-    # Strip whitespace/newlines from the key!
-    api_key_raw = os.environ.get("AGENTS_API_KEY")
-    api_key = api_key_raw.strip() if api_key_raw else None
+    # No API key required for this public/personal endpoint
     
-    if not api_key:
-        logger.error("AGENTS_API_KEY environment variable not set")
-        raise HTTPException(status_code=500, detail="Server configuration error: API Key missing")
-
     headers = {
-        "x-api-key": api_key,
         "Content-Type": "application/json",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        "User-Agent": "Mozilla/5.0 (DeepResearchUI)"
     }
 
+    # Adapted payload for the Deep Research Agent
     payload = {
-        "output_type": "chat",
-        "input_type": "chat",
-        "input_value": request.query,
-        "session_id": str(uuid.uuid4())
+        "prompt": request.query
     }
 
     def make_request():
+        # strict=False allows for potentially malformed JSON or other content types if needed, 
+        # though standard requests use standard JSON encoding.
         return requests.post(API_URL, json=payload, headers=headers)
 
     try:
-        logger.info(f"Sending request to IBM Agent API for query: {request.query}")
+        logger.info(f"Sending request to Deep Research API: {API_URL}")
         
         response = await run_in_threadpool(make_request)
         
@@ -71,19 +65,8 @@ async def perform_research(request: ResearchRequest):
         try:
             return response.json()
         except Exception:
-             # Enhanced debugging for non-JSON responses
-            key_debug = f"Len={len(api_key)}" if api_key else "None"
-            if api_key and len(api_key) > 6:
-                key_debug += f", Start={api_key[:3]}..., End=...{api_key[-3:]}"
-                
-            debug_info = (
-                f"Status: {response.status_code} | "
-                f"Key-Debug: {key_debug} | "
-                f"Headers: {dict(response.headers)} | "
-                f"Content-Repr: {repr(response.text[:200])}"
-            )
-            logger.error(f"Invalid JSON response. {debug_info}")
-            raise HTTPException(status_code=500, detail=f"Invalid API Response. {debug_info}")
+             # Fallback if the response is simple text
+            return {"output_value": response.text}
             
     except requests.exceptions.RequestException as exc:
         logger.error(f"Connection error: {exc}")
