@@ -8,6 +8,8 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.concurrency import run_in_threadpool
 from pydantic import BaseModel
 import requests
+import time
+import re
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -47,33 +49,76 @@ def process_research_background(job_id: str, query: str):
             "User-Agent": "Mozilla/5.0 (DeepResearchUI)"
         }
         
-        payload = {"prompt": query}
+        # Initial Request
+        current_payload = {"prompt": query}
+        upstream_job_id = None
+        start_time = time.time()
         
-        logger.info(f"Starting background research for job {job_id}")
-        # Increase timeout or allow indefinite waiting if compatible with server limits
-        # Note: Render might still timeout the *connection* after 100s, 
-        # but this thread will keep running if the upstream doesn't cut it.
-        response = requests.post(API_URL, json=payload, headers=headers, timeout=1200) 
-        
-        if response.status_code != 200:
-            logger.error(f"Job {job_id} failed: {response.text}")
-            jobs[job_id] = {
-                "status": "failed", 
-                "error": f"Upstream Error ({response.status_code}): {response.text}"
-            }
-            return
+        # Polling Loop against Upstream
+        while True:
+            # Check for timeout (e.g. 15 mins)
+            if time.time() - start_time > 1200:
+                raise Exception("Upstream polling timed out")
 
-        # Success - Parse result
-        try:
-            result = response.json()
-        except Exception:
-            result = {"output_value": response.text}
+            logger.info(f"Polling upstream for job {job_id} with payload: {current_payload}")
+            response = requests.post(API_URL, json=current_payload, headers=headers, timeout=60)
             
-        jobs[job_id] = {
-            "status": "completed",
-            "result": result
-        }
-        logger.info(f"Job {job_id} completed successfully.")
+            if response.status_code != 200:
+                logger.error(f"Upstream Error: {response.text}")
+                jobs[job_id] = {"status": "failed", "error": f"Upstream Error: {response.status_code}"}
+                return
+
+            # Parse Response
+            try:
+                data = response.json()
+            except:
+                # Text response -> assume final result?
+                jobs[job_id] = {"status": "completed", "result": {"output_value": response.text}}
+                return
+
+            # Logic to detect if it's still processing
+            # Pattern: { "response": [ { "message": "Research started. Job ID: <UUID>...", ... } ] }
+            is_processing = False
+            msg_text = ""
+            
+            # Extract message text from various JSON structures
+            if isinstance(data, dict):
+                if "response" in data and isinstance(data["response"], list) and len(data["response"]) > 0:
+                    msg_text = data["response"][0].get("message", "")
+                elif "output_value" in data:
+                    msg_text = data["output_value"]
+                elif "message" in data:
+                    msg_text = data["message"]
+            
+            # Check for "Job ID" pattern
+            import re
+            match = re.search(r"Job ID:\s*([a-f0-9\-]+)", msg_text)
+            
+            if match:
+                # Upstream says it's processing/started
+                extracted_id = match.group(1)
+                
+                # If this is the first time, or if we are just continuing to poll
+                upstream_job_id = extracted_id
+                
+                # Prepare payload for NEXT poll: "Job ID: <UUID>"
+                # logic: The message "Re-run with this Job ID" implies sending it back.
+                current_payload = {"prompt": f"Job ID: {upstream_job_id}"}
+                
+                # Wait before next poll
+                time.sleep(10) 
+                continue # Loop again
+            else:
+                # No "Job ID" message found -> Assume this is the FINAL result?
+                # However, ensure it's not some other error.
+                # If we were previously polling and now got something else, it's likely the result.
+                
+                jobs[job_id] = {
+                    "status": "completed",
+                    "result": data
+                }
+                logger.info(f"Job {job_id} completed successfully.")
+                return
 
     except Exception as e:
         logger.error(f"Job {job_id} exception: {str(e)}")
