@@ -90,7 +90,7 @@ def process_research_background(job_id: str, query: str):
                 elif "message" in data:
                     msg_text = data["message"]
             
-            # Check for "Job ID" pattern
+            # Check for "Job ID" pattern in the INITIAL response
             import re
             match = re.search(r"Job ID:\s*([a-f0-9\-]+)", msg_text)
             
@@ -101,24 +101,27 @@ def process_research_background(job_id: str, query: str):
                 # If this is the first time, or if we are just continuing to poll
                 upstream_job_id = extracted_id
                 
-                # Prepare payload for NEXT poll: "Job ID: <UUID>"
-                # logic: The message "Re-run with this Job ID" implies sending it back.
-                current_payload = {"prompt": f"Job ID: {upstream_job_id}"}
+                # Prepare payload for NEXT poll: Use 'job_id' key!
+                current_payload = {"job_id": upstream_job_id}
                 
                 # Wait before next poll
                 time.sleep(10) 
                 continue # Loop again
-            else:
-                # No "Job ID" message found -> Assume this is the FINAL result?
-                # However, ensure it's not some other error.
-                # If we were previously polling and now got something else, it's likely the result.
-                
-                jobs[job_id] = {
-                    "status": "completed",
-                    "result": data
-                }
-                logger.info(f"Job {job_id} completed successfully.")
-                return
+
+            # Check if it says "Research in progress"
+            if "Research in progress" in msg_text:
+                # Still running, just wait and poll again
+                # current_payload is already {"job_id": ...} from previous loop
+                time.sleep(10)
+                continue
+
+            # If we get here, it's not "Started" and not "In Progress" -> It must be the Result
+            jobs[job_id] = {
+                "status": "completed",
+                "result": data
+            }
+            logger.info(f"Job {job_id} completed successfully.")
+            return
 
     except Exception as e:
         logger.error(f"Job {job_id} exception: {str(e)}")
