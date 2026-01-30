@@ -90,6 +90,8 @@ def process_research_background(job_id: str, query: str):
                 elif "message" in data:
                     msg_text = data["message"]
             
+            logger.info(f"Upstream Poll Response: {msg_text}")
+
             # Check for "Job ID" pattern in the INITIAL response
             import re
             match = re.search(r"Job ID:\s*([a-f0-9\-]+)", msg_text)

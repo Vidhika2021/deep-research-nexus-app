@@ -79,6 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
             markdownText = data;
         } else if (data.output_value) {
             markdownText = data.output_value;
+        } else if (data.response && Array.isArray(data.response) && data.response.length > 0 && data.response[0].message) {
+            markdownText = data.response[0].message;
         } else if (data.content && Array.isArray(data.content)) {
             markdownText = data.content.map(c => c.text || '').join('\n');
         } else if (data.text) { 
