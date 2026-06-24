@@ -24,11 +24,54 @@
 
         <section class="search-section">
             <div class="search-box">
-                <input type="text" id="queryInput" placeholder="What requires deep investigation today?" autocomplete="off">
+                <textarea id="queryInput" placeholder="What requires deep investigation today?" autocomplete="off" rows="1"></textarea>
                 <button id="searchBtn" class="search-btn">
                     <span class="btn-text">Initialize Research</span>
                     <div class="loader hidden"></div>
                 </button>
+            </div>
+
+            <div class="sample-prompts-container">
+                <div class="sample-prompts-header">
+                    <span class="section-label">Suggested Templates</span>
+                </div>
+                <div class="sample-prompts-grid">
+                    <div class="prompt-card" data-index="1">
+                        <div class="prompt-card-header">
+                            <h3 class="prompt-title">Account Briefing</h3>
+                            <span class="prompt-badge briefing">Briefing</span>
+                        </div>
+                        <p class="prompt-desc">Comprehensive outside-in view covering snapshot, 10-bullet executive summary, and 2020-2026 financial tables.</p>
+                        <div class="prompt-card-actions">
+                            <button class="prompt-action-btn use-btn">Use Template</button>
+                            <button class="prompt-action-btn copy-btn-small">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="prompt-card" data-index="2">
+                        <div class="prompt-card-header">
+                            <h3 class="prompt-title">Priorities &amp; Challenges</h3>
+                            <span class="prompt-badge strategy">Strategy</span>
+                        </div>
+                        <p class="prompt-desc">Detailed briefing covering management priorities, key challenges, and leadership profiles with tenure and agenda.</p>
+                        <div class="prompt-card-actions">
+                            <button class="prompt-action-btn use-btn">Use Template</button>
+                            <button class="prompt-action-btn copy-btn-small">Copy</button>
+                        </div>
+                    </div>
+
+                    <div class="prompt-card" data-index="3">
+                        <div class="prompt-card-header">
+                            <h3 class="prompt-title">Sales Intelligence</h3>
+                            <span class="prompt-badge sales">Sales Intel</span>
+                        </div>
+                        <p class="prompt-desc">Sales intelligence report detailing industry trends, digital initiatives, partner landscape, and IBM interest/whitespace.</p>
+                        <div class="prompt-card-actions">
+                            <button class="prompt-action-btn use-btn">Use Template</button>
+                            <button class="prompt-action-btn copy-btn-small">Copy</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 

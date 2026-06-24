@@ -116,6 +116,7 @@ body {
 
 .search-box {
     display: flex;
+    align-items: flex-end;
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: 16px;
@@ -130,18 +131,22 @@ body {
     box-shadow: 0 0 20px var(--accent-glow);
 }
 
-input[type="text"] {
+textarea#queryInput {
     flex: 1;
     background: transparent;
     border: none;
-    padding: 1rem 1.5rem;
+    padding: 0.8rem 1rem;
     font-size: 1.1rem;
     color: #fff;
     outline: none;
     font-family: var(--font-main);
+    resize: none;
+    min-height: 48px;
+    max-height: 250px;
+    line-height: 1.5;
 }
 
-input[type="text"]::placeholder {
+textarea#queryInput::placeholder {
     color: rgba(255, 255, 255, 0.4);
 }
 
@@ -149,7 +154,7 @@ input[type="text"]::placeholder {
     background: linear-gradient(135deg, var(--accent-color), #4f46e5);
     border: none;
     border-radius: 12px;
-    padding: 0 2rem;
+    padding: 0 1.5rem;
     color: white;
     font-weight: 600;
     cursor: pointer;
@@ -160,6 +165,9 @@ input[type="text"]::placeholder {
     display: flex;
     justify-content: center;
     align-items: center;
+    align-self: flex-end;
+    height: 46px;
+    margin-bottom: 2px;
 }
 
 .search-btn:hover {
@@ -283,6 +291,143 @@ input[type="text"]::placeholder {
     background: transparent;
     padding: 0;
     color: #e5e7eb;
+}
+
+/* Sample Prompts Section */
+.sample-prompts-container {
+    margin-top: 1.5rem;
+    width: 100%;
+    animation: fadeIn 0.6s ease-out;
+}
+
+.sample-prompts-header {
+    margin-bottom: 0.75rem;
+    padding-left: 0.25rem;
+}
+
+.section-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    opacity: 0.8;
+}
+
+.sample-prompts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    width: 100%;
+}
+
+.prompt-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(8px);
+}
+
+.prompt-card:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(99, 102, 241, 0.35);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.08);
+}
+
+.prompt-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    gap: 0.5rem;
+}
+
+.prompt-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+}
+
+.prompt-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+
+.prompt-badge.briefing {
+    background: rgba(99, 102, 241, 0.15);
+    color: #a5b4fc;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.prompt-badge.strategy {
+    background: rgba(236, 72, 153, 0.15);
+    color: #fbcfe8;
+    border: 1px solid rgba(236, 72, 153, 0.3);
+}
+
+.prompt-badge.sales {
+    background: rgba(16, 185, 129, 0.15);
+    color: #a7f3d0;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.prompt-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    margin-bottom: 1.25rem;
+    flex-grow: 1;
+}
+
+.prompt-card-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.prompt-action-btn {
+    font-family: var(--font-main);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.5rem 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.prompt-action-btn.use-btn {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+}
+
+.prompt-action-btn.use-btn:hover {
+    background: var(--accent-color);
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.prompt-action-btn.copy-btn-small {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+}
+
+.prompt-action-btn.copy-btn-small:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 footer {
