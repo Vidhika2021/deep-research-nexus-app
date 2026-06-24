@@ -140,26 +140,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Prompt templates definitions
     const templates = {
-        1: `You are an IBM consultant seeking an outside-in view of <Account Name>. Using only credible public sources from the last 12 months, prepare an executive-ready account briefing covering the following sections. Cite source links in [Title](URL) format at the bottom of every section. Prefer primary sources first (company website, annual reports, investor materials, regulatory filings, press releases).
-Sections:
-1. Executive Summary – 10-bullet summary of Telstra's current corporate and financial standing, with key terms in bold.
-2. Top 5 Takeaways – A "Top 5 Takeaways for Account Teams" box with key points in bold.
-3. Company Snapshot – Legal entity, parent, HQ, geographies, industry, core business, ownership, ticker, links to annual reports/filings, headcount, and revenue scale.
-4. Financial Performance – Provide a markdown table of revenue, profit, and margins for the years 2020–2026. Provide a second table showing the share price trend vs. major competitors over time, followed by competitive performance commentary.
-Sources – Grouped by type (company reports, IR, filings, regulatory, news).`,
-        2: `You are an IBM consultant seeking an outside-in view of Telstra. Using only credible public sources from the last 12 months, prepare an executive-ready briefing covering the following sections. Cite source links in [Title](URL) format at the bottom of every section. Prefer primary sources first (company website, annual reports, investor materials, regulatory filings, press releases).
-Sections:
-1. Management Priorities – Telstra's financial goals for the current year and next 5 years, and overall strategic objectives for the next 5 years.
-2. Key Challenges – Provide a 5-column markdown table: Challenge | Description | Business Impact | Likely Executive Owner | Evidence.
-3. Leadership Team Profiles – Provide a 4-column markdown table: Name | Role & Tenure | Personal Agenda | Business Agenda. Then, include detailed per-person sub-sections for the top 3 executives covering their previous roles, known IBM or competitor connections, and their LinkedIn links.
-Sources – Grouped by type (company reports, filings, press releases, news).`,
-        3: `You are an IBM consultant seeking an outside-in view of <Account Name>. Using only credible public sources from the last 12 months, prepare an executive-ready sales intelligence report covering the following sections. Cite source links in [Title](URL) format at the bottom of every section. Prefer primary sources first (company website, annual reports, investor materials, regulatory filings, press releases).
-Sections:
-1. Industry & Competitive Context – Top 5 trends, consumer behaviour shifts (last 12–24 months), disruptive technologies, innovation leaders, biggest competitive threats, and notable M&A/partnerships.
-2. IT/Digital Initiatives – Provide a 5-column markdown table: Initiative | Description | Business Objective | Evidence | Likely Owner (only for publicly documented initiatives).
-3. IT/Partner Landscape – Provide a 5-column markdown table: Vendor | Support Area | Business Area | Evidence | Confidence (High/Med/Low).
-4. Sales & Differentiated Intelligence – IBM interest/whitespace, business triggers, transformation themes, exec vs. IT messaging, discovery hypotheses, and recent announcements, executive quotes, or cyber incidents.
-Sources – Grouped by type (partner/vendor, industry, news, company releases).`
+        1: `Search the web extensively. You are an IBM consultant building an executive-ready account briefing on [Account Name] using credible public sources from the last 12 months. Prioritize primary sources (investor relations, annual reports, regulatory filings, press releases) over secondary (news, analyst coverage).
+Deliver these sections, citing sources in Title format at the end of each:
+1. Executive Summary – 10 bold-keyed bullets covering current corporate and financial standing.
+2. Top 5 Takeaways for Account Teams – Boxed format, key phrases in bold, actionable for an IBM seller.
+3. Company Snapshot – Legal entity, parent company, HQ, geographies, industry, core business, ownership structure, ticker, headcount, revenue scale, and links to latest annual report/filings.
+4. Financial Performance – Markdown table of revenue, profit, and margins (2020–2026). Second markdown table showing share price trend vs. major competitors over the same period, followed by brief competitive performance commentary.
+5. Sources – Grouped by type: company reports, investor relations, filings, regulatory, news.
+Be thorough — run as many searches as needed to fill every section with specific, sourced detail. Do not leave sections incomplete or ask me for input.`,
+        2: `Search the web extensively. You are an IBM consultant building an outside-in strategy and leadership brief on <Account>using credible public sources from the last 12 months. Prioritize primary sources (investor relations, annual reports, ASX filings, press releases) over secondary (news, analyst coverage).
+Deliver these sections, citing sources in Title format at the end of each:
+1. Management Priorities – Telstra's financial targets (current year + 5-year outlook) and strategic objectives for the next 5 years (e.g. T25/T30 strategy pillars).
+2. Key Challenges – Markdown table: Challenge | Description | Business Impact | Likely Executive Owner | Evidence.
+3. Leadership Team Profiles – Markdown table: Name | Role & Tenure | Personal Agenda | Business Agenda. Then for the top 3 executives, provide detailed sub-sections covering: previous roles, known IBM or competitor vendor connections, and LinkedIn profile links.
+4. Sources – Grouped by type: company reports, filings, press releases, news.
+Be thorough — run as many searches as needed to fill every section with specific, sourced detail. Do not leave sections incomplete or ask me for input.`,
+        3: `Search the web extensively. You are an IBM consultant building an outside-in sales intelligence brief on Westpac using credible public sources from the last 12 months. Prioritize primary sources (investor relations, annual reports, ASX filings, press releases) over secondary (news, analyst coverage).
+Deliver these sections, citing sources in Title format at the end of each:
+1. Industry & Competitive Context – Top 5 Australian banking trends, consumer behaviour shifts, disruptive technologies, innovation leaders, biggest competitive threats, notable M&A/partnerships.
+2. IT/Digital Initiatives – Markdown table: Initiative | Description | Business Objective | Evidence | Likely Owner. Only publicly documented initiatives.
+3. IT/Partner Landscape – Markdown table: Vendor | Support Area | Business Area | Evidence | Confidence (High/Med/Low).
+4. Sales & Differentiated Intelligence – IBM whitespace opportunities, business triggers, transformation themes, exec vs. IT messaging angles, discovery hypotheses, recent exec quotes or cyber incidents.
+5. Sources – Grouped by type: company releases, regulatory/investor, industry/analyst, news, vendor/partner.
+Be thorough — run as many searches as needed to fill every section with specific, sourced detail. Do not leave sections incomplete or ask me for input.`
     };
 
     // Setup Template Cards Interaction
@@ -176,10 +179,14 @@ Sources – Grouped by type (partner/vendor, industry, news, company releases).`
                 queryInput.focus();
                 
                 // Highlight placeholder so user can change name immediately
-                let targetText = '<Account Name>';
+                let targetText = '[Account Name]';
                 let startPos = templateText.indexOf(targetText);
                 if (startPos === -1) {
-                    targetText = 'Telstra';
+                    targetText = '<Account>';
+                    startPos = templateText.indexOf(targetText);
+                }
+                if (startPos === -1) {
+                    targetText = 'Westpac';
                     startPos = templateText.indexOf(targetText);
                 }
                 
